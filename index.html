@@ -75,13 +75,10 @@
             <p>Paste your resume JSON below:</p>
             <div id="jsonEditor"></div>
             <div id="error" class="error"></div>
-            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
                 <button class="preview-button" onclick="viewResume('resume.html')">View Format 1</button>
                 <button class="preview-button" onclick="viewResume('resume2.html')">View Format 2</button>
                 <button class="preview-button" onclick="viewResume('resume3.html')">View Format 3</button>
-                <button class="preview-button" onclick="downloadResume('resume.html')">Download Format 1</button>
-                <button class="preview-button" onclick="downloadResume('resume2.html')">Download Format 2</button>
-                <button class="preview-button" onclick="downloadResume('resume3.html')">Download Format 3</button>
             </div>
         </div>
     </div>
@@ -149,26 +146,6 @@
                 localStorage.setItem('resumeData', JSON.stringify(resumeData));
                 // Open in new tab
                 window.open(targetPage, '_blank');
-            } catch (e) {
-                errorDiv.textContent = 'Invalid JSON: ' + e.message;
-            }
-        }
-
-        function downloadResume(targetPage) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.textContent = '';
-
-            try {
-                const jsonText = editor.getValue();
-
-                if (!jsonText || jsonText.trim() === '') {
-                    errorDiv.textContent = 'Please enter JSON data.';
-                    return;
-                }
-
-                const resumeData = JSON.parse(jsonText);
-                localStorage.setItem('resumeData', JSON.stringify(resumeData));
-                window.open(`${targetPage}?download=1`, '_blank');
             } catch (e) {
                 errorDiv.textContent = 'Invalid JSON: ' + e.message;
             }
