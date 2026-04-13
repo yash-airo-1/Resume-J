@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Resume</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f4f4f4;
+font-size:13px;
+line-height:1.4;
+}
+
+:root{
+--page-scale:1;
+}
+
+.container{
+display:grid;
+grid-template-columns:65% 35%;
+width:900px;
+height:1120px;
+margin:auto;
+background:white;
+overflow:hidden;
+transform:scale(0.97);
+transform-origin:top center;
+}
+
+.left{
+padding:25px;
+}
+
+.right{
+padding:25px;
+background:#fafafa;
+border-left:3px solid #e74c3c;
+}
+
+h1{
+margin-bottom:5px;
+font-size:26px;
+}
+
+.subtitle{
+color:#e74c3c;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+.section{
+margin-top:15px;
+}
+
+.section-title{
+color:#e74c3c;
+font-weight:bold;
+border-bottom:2px solid #e74c3c;
+padding-bottom:4px;
+margin-bottom:8px;
+}
+
+.project{
+margin-bottom:12px;
+}
+
+ul{
+padding-left:18px;
+margin:4px 0;
+}
+
+.skills span{
+display:inline-block;
+background:#e74c3c;
+color:white;
+padding:5px 9px;
+margin:3px;
+border-radius:4px;
+font-size:11px;
+}
+.top-logo{
+display:flex;
+justify-content:center;
+margin-bottom:15px;
+}
+.top-logo img{
+max-width:120px;
+height:auto;
+}
+
+.job{
+margin-bottom:12px;
+}
+
+.job-title{
+font-weight:bold;
+margin-bottom:4px;
+}
+
+@media print{
+body{
+background:white !important;
+margin:0 !important;
+}
+.container{
+transform:scale(var(--page-scale)) !important;
+transform-origin:top left !important;
+margin:0 !important;
+page-break-inside:avoid;
+}
+}
+
+@page{
+size:A4;
+margin:0;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="left">
+
+<h1 id="name"></h1>
+<div class="subtitle" id="experience"></div>
+
+<div class="section">
+<div class="section-title">Summary</div>
+<p id="summary"></p>
+</div>
+
+<div class="section">
+<div class="section-title">Project Details</div>
+<div id="projects"></div>
+</div>
+
+</div>
+
+<div class="right">
+
+<div class="top-logo">
+<img src="https://airolabs.ai/wp-content/uploads/2024/04/div-logo.png" alt="Airo Labs Logo">
+</div>
+
+<div class="section">
+<div class="section-title">Work Experience</div>
+<div id="work"></div>
+</div>
+
+<div class="section">
+<div class="section-title">Technical Skills</div>
+<div class="skills" id="skills"></div>
+</div>
+
+<div class="section">
+<div class="section-title">Domain Skills</div>
+<div class="skills" id="domains"></div>
+</div>
+
+<div class="section">
+<div class="section-title">Education</div>
+<ul id="education"></ul>
+</div>
+
+<div class="section">
+<div class="section-title">Interests</div>
+<ul id="interests"></ul>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+// Detect preview mode and hide scrollbars
+const urlParams = new URLSearchParams(globalThis.location.search);
+const isPreview = urlParams.has('preview');
+const isDownload = urlParams.get('download') === '1';
+
+if (isPreview) {
+    const style = document.createElement('style');
+    style.textContent = `
+        body { overflow: hidden !important; }
+        html { overflow: hidden !important; }
+        ::-webkit-scrollbar { display: none !important; }
+        * { scrollbar-width: none !important; }
+    `;
+    document.head.appendChild(style);
+}
+
+// Load resume data from localStorage or use default
+let resume;
+try {
+    const storedData = localStorage.getItem('resumeData') || sessionStorage.getItem('resumeData');
+    if (storedData) {
+        resume = JSON.parse(storedData);
+    } else {
+        // Default resume data
+        resume = {
+  "name": "Sample Resume - John Doe",
+  "experience_years": "5+",
+  "summary": "This is a sample resume template. Please use the input page to paste your own JSON data and generate your personalized resume. This demonstrates the format and structure expected for resume data.",
+  "projects": [
+    {
+      "project_name": "Sample Project 1",
+      "organization": "Sample Company",
+      "team_size": "5",
+      "role": "Developer",
+      "tasks": [
+        "Developed and maintained web applications using modern technologies.",
+        "Collaborated with cross-functional teams to deliver high-quality solutions.",
+        "Implemented best practices for code quality and performance."
+      ]
+    },
+    {
+      "project_name": "Sample Project 2",
+      "organization": "Sample Organization",
+      "team_size": "3",
+      "role": "Lead Developer",
+      "tasks": [
+        "Led development of mobile application with React Native.",
+        "Managed project timeline and deliverables.",
+        "Conducted code reviews and mentored junior developers."
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "designation": "Senior Software Developer",
+      "company": "Sample Tech Corp",
+      "location": "Sample City",
+      "duration": "2020-Present",
+      "responsibilities": [
+        "Develop and maintain enterprise-level web applications.",
+        "Lead technical architecture decisions and implementation.",
+        "Mentor junior developers and conduct code reviews."
+      ]
+    },
+    {
+      "designation": "Software Developer",
+      "company": "Sample Solutions Inc",
+      "location": "Sample City",
+      "duration": "2018-2020",
+      "responsibilities": [
+        "Built responsive web applications using modern frameworks.",
+        "Collaborated with design team to implement user interfaces.",
+        "Participated in agile development processes."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "JavaScript",
+    "Python",
+    "React",
+    "Node.js",
+    "SQL",
+    "Git"
+  ],
+  "domain_skills": [
+    "Web Development",
+    "API Design",
+    "Database Management",
+    "Agile Methodology"
+  ],
+  "education": [
+    "Bachelor of Computer Science",
+    "Sample University"
+  ],
+  "interests": [
+    "Reading",
+    "Coding",
+    "Travel"
+  ]
+};
+    }
+} catch (e) {
+    console.error('Error loading resume data:', e);
+    // Fallback to default
+    resume = {
+  "name": "Sample Resume - John Doe",
+  "experience_years": "5+",
+  "summary": "This is a sample resume template. Please use the input page to paste your own JSON data and generate your personalized resume. This demonstrates the format and structure expected for resume data.",
+  "projects": [
+    {
+      "project_name": "Sample Project 1",
+      "organization": "Sample Company",
+      "team_size": "5",
+      "role": "Developer",
+      "tasks": [
+        "Developed and maintained web applications using modern technologies.",
+        "Collaborated with cross-functional teams to deliver high-quality solutions.",
+        "Implemented best practices for code quality and performance."
+      ]
+    },
+    {
+      "project_name": "Sample Project 2",
+      "organization": "Sample Organization",
+      "team_size": "3",
+      "role": "Lead Developer",
+      "tasks": [
+        "Led development of mobile application with React Native.",
+        "Managed project timeline and deliverables.",
+        "Conducted code reviews and mentored junior developers."
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "designation": "Senior Software Developer",
+      "company": "Sample Tech Corp",
+      "location": "Sample City",
+      "duration": "2020-Present",
+      "responsibilities": [
+        "Develop and maintain enterprise-level web applications.",
+        "Lead technical architecture decisions and implementation.",
+        "Mentor junior developers and conduct code reviews."
+      ]
+    },
+    {
+      "designation": "Software Developer",
+      "company": "Sample Solutions Inc",
+      "location": "Sample City",
+      "duration": "2018-2020",
+      "responsibilities": [
+        "Built responsive web applications using modern frameworks.",
+        "Collaborated with design team to implement user interfaces.",
+        "Participated in agile development processes."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "JavaScript",
+    "Python",
+    "React",
+    "Node.js",
+    "SQL",
+    "Git"
+  ],
+  "domain_skills": [
+    "Web Development",
+    "API Design",
+    "Database Management",
+    "Agile Methodology"
+  ],
+  "education": [
+    "Bachelor of Computer Science",
+    "Sample University"
+  ],
+  "interests": [
+    "Reading",
+    "Coding",
+    "Travel"
+  ]
+};
+}
+
+
+// BASIC INFO
+
+document.getElementById("name").innerText = resume.name;
+
+document.getElementById("experience").innerText =
+"Professional Experience : " + resume.experience_years;
+
+document.getElementById("summary").innerText = resume.summary;
+
+
+// PROJECTS
+
+resume.projects.forEach(p => {
+
+let div = document.createElement("div");
+div.className="project";
+
+let title = document.createElement("h4");
+title.innerText = p.project_name;
+
+let meta = document.createElement("p");
+meta.innerHTML =
+"<b>Role:</b> "+p.role+
+"<br><b>Organization:</b> "+p.organization;
+
+let ul = document.createElement("ul");
+
+p.tasks.forEach(t=>{
+let li=document.createElement("li");
+li.innerText=t;
+ul.appendChild(li);
+});
+
+div.appendChild(title);
+div.appendChild(meta);
+div.appendChild(ul);
+
+document.getElementById("projects").appendChild(div);
+
+});
+
+
+// WORK EXPERIENCE
+
+resume.work_experience.forEach(w=>{
+
+let div=document.createElement("div");
+div.className="job";
+
+let title=document.createElement("p");
+title.className="job-title";
+
+title.innerHTML =
+w.designation+"<br>"+
+w.company+" | "+w.location+"<br>"+
+w.duration;
+
+let ul=document.createElement("ul");
+
+w.responsibilities.forEach(r=>{
+let li=document.createElement("li");
+li.innerText=r;
+ul.appendChild(li);
+});
+
+div.appendChild(title);
+div.appendChild(ul);
+
+document.getElementById("work").appendChild(div);
+
+});
+
+
+// TECH SKILLS
+
+resume.technical_skills.forEach(s=>{
+
+let span=document.createElement("span");
+span.innerText=s;
+
+document.getElementById("skills").appendChild(span);
+
+});
+
+
+// DOMAIN SKILLS
+
+resume.domain_skills.forEach(s=>{
+
+let span=document.createElement("span");
+span.innerText=s;
+
+document.getElementById("domains").appendChild(span);
+
+});
+
+
+// EDUCATION
+
+resume.education.forEach(e=>{
+
+let li=document.createElement("li");
+li.innerText=e;
+
+document.getElementById("education").appendChild(li);
+
+});
+
+
+// INTERESTS
+
+resume.interests.forEach(i=>{
+
+let li=document.createElement("li");
+li.innerText=i;
+
+document.getElementById("interests").appendChild(li);
+
+});
+
+function fitToOnePage(){
+const container = document.querySelector(".container");
+if(!container) return;
+const maxA4HeightPx = 1122;
+container.style.transform = "scale(1)";
+const scale = Math.min(1, maxA4HeightPx / container.scrollHeight);
+document.documentElement.style.setProperty("--page-scale", scale.toFixed(3));
+container.style.transform = `scale(${scale})`;
+}
+
+globalThis.addEventListener("load", ()=>{
+fitToOnePage();
+if(isDownload){
+setTimeout(()=>globalThis.print(), 250);
+}
+});
+
+</script>
+
+</body>
+</html>

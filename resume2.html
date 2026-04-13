@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Resume</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f5f5;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        :root {
+            --page-scale: 1;
+        }
+
+        .container {
+            width: 900px;
+            margin: auto;
+            display: flex;
+            background: white;
+            transform: scale(var(--page-scale));
+            transform-origin: top center;
+        }
+
+        /* LEFT SIDEBAR */
+
+        .sidebar {
+            width: 30%;
+            background: #2c2c2c;
+            color: white;
+            padding: 25px;
+        }
+
+        .sidebar h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar .section {
+            margin-top: 25px;
+        }
+
+        .sidebar .section-title {
+            font-size: 14px;
+            color: #ff4d4d;
+            border-bottom: 1px solid #ff4d4d;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar ul {
+            padding-left: 18px;
+            margin: 5px 0;
+        }
+
+        .sidebar li {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .skills span {
+            display: inline-block;
+            background: #ff4d4d;
+            color: white;
+            padding: 4px 8px;
+            margin: 3px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        /* RIGHT CONTENT */
+
+        .main {
+            width: 70%;
+            padding: 30px;
+        }
+
+        .main .section {
+            margin-bottom: 25px;
+        }
+
+        .main .section-title {
+            color: #ff4d4d;
+            border-bottom: 2px solid #ff4d4d;
+            padding-bottom: 4px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .job-title {
+            font-weight: bold;
+        }
+
+        .company {
+            font-style: italic;
+            font-size: 13px;
+        }
+
+        ul {
+            margin: 6px 0 10px 18px;
+            padding: 0;
+        }
+
+        li {
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        @media print {
+
+            body {
+                background: white !important;
+            }
+
+            .container {
+                width: 900px !important;
+                max-width: none !important;
+                margin: 0 !important;
+                transform: scale(var(--page-scale)) !important;
+                transform-origin: top left !important;
+                page-break-inside: avoid;
+            }
+
+            .sidebar, .main {
+                width: auto !important;
+                float: left !important;
+            }
+
+            .sidebar {
+                width: 30% !important;
+            }
+
+            .main {
+                width: 70% !important;
+            }
+
+            .skills span {
+                background: #ff4d4d !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <!-- LEFT SIDEBAR -->
+
+        <div class="sidebar">
+
+            <div class="top-logo">
+                <img src="https://airolabs.ai/wp-content/uploads/2024/04/div-logo.png" alt="Airo Labs Logo">
+            </div>
+
+            <h1 id="name"></h1>
+
+            <div class="section">
+                <div class="section-title">Technical Skills</div>
+                <div id="technical_skills" class="skills"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Domain Skills</div>
+                <div id="domain_skills" class="skills"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Education</div>
+                <ul id="education"></ul>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Interests</div>
+                <ul id="interests"></ul>
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT MAIN SECTION -->
+
+        <div class="main">
+
+            <div class="section">
+                <div class="section-title">Summary</div>
+                <p id="summary"></p>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Work Experience</div>
+                <div id="experience"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Projects</div>
+                <div id="projects"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // Detect preview mode and hide scrollbars
+        const urlParams = new URLSearchParams(globalThis.location.search);
+        const isPreview = urlParams.has('preview');
+        const isDownload = urlParams.get('download') === '1';
+
+        if (isPreview) {
+            const style = document.createElement('style');
+            style.textContent = `
+                body { overflow: hidden !important; }
+                html { overflow: hidden !important; }
+                ::-webkit-scrollbar { display: none !important; }
+                * { scrollbar-width: none !important; }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Load resume data from localStorage or use default
+        let data;
+        try {
+            const storedData = localStorage.getItem('resumeData') || sessionStorage.getItem('resumeData');
+            if (storedData) {
+                data = JSON.parse(storedData);
+            } else {
+                // Default resume data
+                data = {
+                    "name": "Sample Resume - Jane Smith",
+                    "experience_years": "8+",
+                    "summary": "This is a sample resume template. Please use the input page to paste your own JSON data and generate your personalized resume. This demonstrates the format and structure expected for resume data.",
+                    "projects": [
+                        {
+                            "project_name": "Sample Project A",
+                            "organization": "Sample University",
+                            "team_size": "4",
+                            "role": "Team Lead",
+                            "tasks": [
+                                "Led development of academic research project.",
+                                "Coordinated with team members and faculty advisors.",
+                                "Presented findings to academic community."
+                            ]
+                        },
+                        {
+                            "project_name": "Sample Project B",
+                            "organization": "Sample Institute",
+                            "team_size": "2",
+                            "role": "Developer",
+                            "tasks": [
+                                "Built prototype application for educational purposes.",
+                                "Implemented core functionality and user interface.",
+                                "Tested and validated system performance."
+                            ]
+                        }
+                    ],
+                    "work_experience": [
+                        {
+                            "designation": "Senior Software Engineer",
+                            "company": "Sample Tech Solutions",
+                            "location": "Sample City",
+                            "duration": "2022-Present",
+                            "responsibilities": [
+                                "Lead development of enterprise software solutions.",
+                                "Architect and implement scalable systems.",
+                                "Mentor junior team members and conduct technical reviews."
+                            ]
+                        },
+                        {
+                            "designation": "Software Engineer",
+                            "company": "Sample Systems Corp",
+                            "location": "Sample City",
+                            "duration": "2020-2022",
+                            "responsibilities": [
+                                "Developed web applications using modern technologies.",
+                                "Collaborated with cross-functional teams.",
+                                "Participated in agile development cycles."
+                            ]
+                        },
+                        {
+                            "designation": "Junior Developer",
+                            "company": "Sample Apps Inc",
+                            "location": "Sample City",
+                            "duration": "2019-2020",
+                            "responsibilities": [
+                                "Assisted in development of mobile applications.",
+                                "Learned industry best practices and coding standards.",
+                                "Contributed to testing and quality assurance."
+                            ]
+                        }
+                    ],
+                    "technical_skills": [
+                        "Java",
+                        "Spring Boot",
+                        "React",
+                        "Angular",
+                        "MySQL",
+                        "Docker",
+                        "AWS"
+                    ],
+                    "domain_skills": [
+                        "Software Development",
+                        "System Architecture",
+                        "Cloud Computing",
+                        "DevOps",
+                        "Agile Development"
+                    ],
+                    "education": [
+                        "Master of Computer Science",
+                        "Bachelor of Engineering",
+                        "Sample University"
+                    ],
+                    "interests": [
+                        "Technology",
+                        "Open Source",
+                        "Learning"
+                    ]
+                };
+            }
+        } catch (e) {
+            console.error('Error loading resume data:', e);
+            // Fallback to default
+            data = {
+                "name": "Sample Resume - Jane Smith",
+                "experience_years": "8+",
+                "summary": "This is a sample resume template. Please use the input page to paste your own JSON data and generate your personalized resume. This demonstrates the format and structure expected for resume data.",
+                "projects": [
+                    {
+                        "project_name": "Sample Project A",
+                        "organization": "Sample University",
+                        "team_size": "4",
+                        "role": "Team Lead",
+                        "tasks": [
+                            "Led development of academic research project.",
+                            "Coordinated with team members and faculty advisors.",
+                            "Presented findings to academic community."
+                        ]
+                    },
+                    {
+                        "project_name": "Sample Project B",
+                        "organization": "Sample Institute",
+                        "team_size": "2",
+                        "role": "Developer",
+                        "tasks": [
+                            "Built prototype application for educational purposes.",
+                            "Implemented core functionality and user interface.",
+                            "Tested and validated system performance."
+                        ]
+                    }
+                ],
+                "work_experience": [
+                    {
+                        "designation": "Senior Software Engineer",
+                        "company": "Sample Tech Solutions",
+                        "location": "Sample City",
+                        "duration": "2022-Present",
+                        "responsibilities": [
+                            "Lead development of enterprise software solutions.",
+                            "Architect and implement scalable systems.",
+                            "Mentor junior team members and conduct technical reviews."
+                        ]
+                    },
+                    {
+                        "designation": "Software Engineer",
+                        "company": "Sample Systems Corp",
+                        "location": "Sample City",
+                        "duration": "2020-2022",
+                        "responsibilities": [
+                            "Developed web applications using modern technologies.",
+                            "Collaborated with cross-functional teams.",
+                            "Participated in agile development cycles."
+                        ]
+                    },
+                    {
+                        "designation": "Junior Developer",
+                        "company": "Sample Apps Inc",
+                        "location": "Sample City",
+                        "duration": "2019-2020",
+                        "responsibilities": [
+                            "Assisted in development of mobile applications.",
+                            "Learned industry best practices and coding standards.",
+                            "Contributed to testing and quality assurance."
+                        ]
+                    }
+                ],
+                "technical_skills": [
+                    "Java",
+                    "Spring Boot",
+                    "React",
+                    "Angular",
+                    "MySQL",
+                    "Docker",
+                    "AWS"
+                ],
+                "domain_skills": [
+                    "Software Development",
+                    "System Architecture",
+                    "Cloud Computing",
+                    "DevOps",
+                    "Agile Development"
+                ],
+                "education": [
+                    "Master of Computer Science",
+                    "Bachelor of Engineering",
+                    "Sample University"
+                ],
+                "interests": [
+                    "Technology",
+                    "Open Source",
+                    "Learning"
+                ]
+            };
+        }
+
+
+        document.getElementById("name").innerText = data.name
+        document.getElementById("summary").innerText = data.summary
+
+
+        /* Work Experience */
+
+        let expHTML = ""
+
+        data.work_experience.forEach(e => {
+            expHTML += `
+<div>
+<div class="job-title">${e.designation}</div>
+<div class="company">${e.company} | ${e.duration}</div>
+<ul>
+${e.responsibilities.map(r => `<li>${r}</li>`).join("")}
+</ul>
+</div>
+`
+        })
+
+        document.getElementById("experience").innerHTML = expHTML
+
+
+        /* Projects */
+
+        let projectHTML = ""
+
+        data.projects.forEach(p => {
+            projectHTML += `
+<div>
+<div class="job-title">${p.project_name}</div>
+<div class="company">${p.role}</div>
+<ul>
+${p.tasks.map(t => `<li>${t}</li>`).join("")}
+</ul>
+</div>
+`
+        })
+
+        document.getElementById("projects").innerHTML = projectHTML
+
+
+        /* Technical Skills */
+
+        let techHTML = ""
+
+        data.technical_skills.forEach(skill => {
+            techHTML += `<span>${skill}</span>`
+        })
+
+        document.getElementById("technical_skills").innerHTML = techHTML
+
+
+        /* Domain Skills */
+
+        let domainHTML = ""
+
+        data.domain_skills.forEach(skill => {
+            domainHTML += `<span>${skill}</span>`
+        })
+
+        document.getElementById("domain_skills").innerHTML = domainHTML
+
+
+        /* Education */
+
+        let eduHTML = ""
+
+        data.education.forEach(e => {
+            eduHTML += `<li>${e}</li>`
+        })
+
+        document.getElementById("education").innerHTML = eduHTML
+
+
+        /* Interests */
+
+        let intHTML = ""
+
+        data.interests.forEach(i => {
+            intHTML += `<li>${i}</li>`
+        })
+
+        document.getElementById("interests").innerHTML = intHTML
+
+        function fitToOnePage() {
+            const container = document.querySelector(".container");
+            if (!container) return;
+            const maxA4HeightPx = 1122;
+            container.style.transform = "scale(1)";
+            const scale = Math.min(1, maxA4HeightPx / container.scrollHeight);
+            document.documentElement.style.setProperty("--page-scale", scale.toFixed(3));
+            container.style.transform = `scale(${scale})`;
+        }
+
+        globalThis.addEventListener("load", () => {
+            fitToOnePage();
+            if (isDownload) {
+                setTimeout(() => globalThis.print(), 250);
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>

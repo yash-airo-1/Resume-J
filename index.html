@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Formatter - Input</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: #f4f4f4;
+        }
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: calc(100vh - 30px);
+        }
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        h1 {
+            color: #e74c3c;
+            text-align: center;
+            margin: 5px 0;
+            font-size: 22px;
+        }
+        p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        #jsonEditor {
+            width: 100%;
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+            min-height: 0;
+        }
+        .error {
+            color: red;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        .preview-button {
+            padding: 8px 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .preview-button:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h1>Resume Formatter</h1>
+            <p>Paste your resume JSON below:</p>
+            <div id="jsonEditor"></div>
+            <div id="error" class="error"></div>
+            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                <button class="preview-button" onclick="viewResume('resume.html')">View Format 1</button>
+                <button class="preview-button" onclick="viewResume('resume2.html')">View Format 2</button>
+                <button class="preview-button" onclick="viewResume('resume3.html')">View Format 3</button>
+                <button class="preview-button" onclick="downloadResume('resume.html')">Download Format 1</button>
+                <button class="preview-button" onclick="downloadResume('resume2.html')">Download Format 2</button>
+                <button class="preview-button" onclick="downloadResume('resume3.html')">Download Format 3</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+    <script>
+        let editor;
+
+        // Initialize the Ace Editor
+        document.addEventListener('DOMContentLoaded', function() {
+            editor = ace.edit('jsonEditor');
+            editor.session.setMode('ace/mode/json');
+            editor.setTheme('ace/theme/chrome');
+            editor.setValue('');
+            editor.setFontSize(11);
+            editor.setOptions({
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true,
+                enableSnippets: true
+            });
+
+            // Auto-format JSON when pasted
+            document.getElementById('jsonEditor').addEventListener('paste', function(e) {
+                setTimeout(() => {
+                    const content = editor.getValue();
+                    try {
+                        const parsed = JSON.parse(content);
+                        const formatted = JSON.stringify(parsed, null, 2);
+                        editor.setValue(formatted);
+                        editor.clearSelection();
+                    } catch (err) {
+                        // Invalid JSON, don't auto-format
+                    }
+                }, 10);
+            });
+
+            // Update previews when JSON changes
+            editor.session.on('change', function() {
+                // Preview removed
+            });
+
+            // Also update on key events for real-time preview
+            editor.session.on('changeAnnotation', function() {
+                // Preview removed
+            });
+
+            // Initial preview load - removed
+        });
+
+        function viewResume(targetPage) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = '';
+
+            try {
+                // Get JSON from editor
+                const jsonText = editor.getValue();
+
+                if (!jsonText || jsonText.trim() === '') {
+                    errorDiv.textContent = 'Please enter JSON data.';
+                    return;
+                }
+
+                const resumeData = JSON.parse(jsonText);
+                // Store in localStorage
+                localStorage.setItem('resumeData', JSON.stringify(resumeData));
+                // Open in new tab
+                window.open(targetPage, '_blank');
+            } catch (e) {
+                errorDiv.textContent = 'Invalid JSON: ' + e.message;
+            }
+        }
+
+        function downloadResume(targetPage) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = '';
+
+            try {
+                const jsonText = editor.getValue();
+
+                if (!jsonText || jsonText.trim() === '') {
+                    errorDiv.textContent = 'Please enter JSON data.';
+                    return;
+                }
+
+                const resumeData = JSON.parse(jsonText);
+                localStorage.setItem('resumeData', JSON.stringify(resumeData));
+                window.open(`${targetPage}?download=1`, '_blank');
+            } catch (e) {
+                errorDiv.textContent = 'Invalid JSON: ' + e.message;
+            }
+        }
+    </script>
+</body>
+</html>
